@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfect Guess Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --info: #560bad;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--dark);
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .game-status {
+            padding: 15px 20px;
+            background-color: var(--light);
+            text-align: center;
+            font-weight: 500;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .game-status.winner {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .players-container {
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .player-card {
+            flex: 1;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .player-card.active {
+            border-color: var(--accent);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.2);
+        }
+
+        .player-card.completed {
+            border-color: var(--info);
+            background: rgba(86, 11, 173, 0.05);
+        }
+
+        .player-card.winner {
+            border-color: var(--success);
+            background: rgba(76, 201, 240, 0.05);
+        }
+
+        .player-card h2 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .player-card.completed h2 {
+            color: var(--info);
+        }
+
+        .player-card.winner h2 {
+            color: var(--success);
+        }
+
+        .player-card .badge {
+            background: var(--accent);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .player-card.completed .badge {
+            background: var(--info);
+        }
+
+        .player-card.winner .badge {
+            background: var(--success);
+        }
+
+        .player-stats {
+            margin-top: 10px;
+        }
+
+        .player-stats p {
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .player-stats .label {
+            font-weight: 500;
+            color: var(--dark);
+            opacity: 0.7;
+        }
+
+        .player-stats .value {
+            font-weight: 600;
+        }
+
+        .guess-section {
+            padding: 20px;
+            background: var(--light);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        input[type="number"] {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--dark);
+            border: 1px solid #dee2e6;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #e5177b;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @media (max-width: 768px) {
+            .players-container {
+                flex-direction: column;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Perfect Guess Game</h1>
+            <p>Two players take turns guessing a number between 1-100. The player with fewer attempts wins!</p>
+        </div>
+
+        <div id="gameStatus" class="game-status">
+            Start a new game to play!
+        </div>
+
+        <div class="players-container">
+            <div id="player1Card" class="player-card">
+                <h2>Player 1 <span id="player1Badge" class="badge" style="display: none;">Your turn</span></h2>
+                <div class="player-stats">
+                    <p><span class="label">Guessed:</span> <span id="player1Guess" class="value">-</span></p>
+                    <p><span class="label">Attempts:</span> <span id="player1Attempts" class="value">0</span></p>
+                </div>
+            </div>
+
+            <div id="player2Card" class="player-card">
+                <h2>Player 2 <span id="player2Badge" class="badge" style="display: none;">Your turn</span></h2>
+                <div class="player-stats">
+                    <p><span class="label">Guessed:</span> <span id="player2Guess" class="value">-</span></p>
+                    <p><span class="label">Attempts:</span> <span id="player2Attempts" class="value">0</span></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="guess-section">
+            <h3>Enter guess (1-100)</h3>
+            <div class="input-group">
+                <input type="number" id="guessInput" min="1" max="100" placeholder="Your guess...">
+                <button id="submitGuessBtn" class="btn btn-primary">Submit Guess</button>
+            </div>
+            
+            <div class="actions">
+                <button id="newGameBtn" class="btn btn-secondary">New Game</button>
+                <button id="revealNumberBtn" class="btn btn-danger">Reveal Number</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentGameId = null;
+        let currentPhase = 1; // 1 = Player 1's turn, 2 = Player 2's turn
+
+        // DOM elements
+        const gameStatusEl = document.getElementById('gameStatus');
+        const player1Card = document.getElementById('player1Card');
+        const player2Card = document.getElementById('player2Card');
+        const player1Badge = document.getElementById('player1Badge');
+        const player2Badge = document.getElementById('player2Badge');
+        const player1Guess = document.getElementById('player1Guess');
+        const player2Guess = document.getElementById('player2Guess');
+        const player1Attempts = document.getElementById('player1Attempts');
+        const player2Attempts = document.getElementById('player2Attempts');
+        const guessInput = document.getElementById('guessInput');
+        const submitGuessBtn = document.getElementById('submitGuessBtn');
+        const newGameBtn = document.getElementById('newGameBtn');
+        const revealNumberBtn = document.getElementById('revealNumberBtn');
+
+        // Event listeners
+        newGameBtn.addEventListener('click', startNewGame);
+        submitGuessBtn.addEventListener('click', submitGuess);
+        revealNumberBtn.addEventListener('click', revealNumber);
+        guessInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') submitGuess();
+        });
+
+        // Initialize game
+        function initGame() {
+            player1Guess.textContent = '-';
+            player2Guess.textContent = '-';
+            player1Attempts.textContent = '0';
+            player2Attempts.textContent = '0';
+            player1Badge.style.display = 'none';
+            player2Badge.style.display = 'none';
+            player1Card.classList.remove('active', 'completed', 'winner', 'pulse');
+            player2Card.classList.remove('active', 'completed', 'winner', 'pulse');
+            guessInput.value = '';
+            currentPhase = 1;
+            submitGuessBtn.disabled = false;
+        }
+
+        // Start new game
+        async function startNewGame() {
+            try {
+                const response = await fetch('/api/new-game', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({})
+                });
+                
+                const data = await response.json();
+                currentGameId = data.game_id;
+                currentPhase = 1;
+                
+                initGame();
+                
+                gameStatusEl.textContent = `Player 1's turn - Start guessing!`;
+                gameStatusEl.classList.remove('winner');
+                
+                player1Card.classList.add('active', 'pulse');
+                player1Badge.style.display = 'inline-block';
+                player1Badge.textContent = 'Your turn';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Failed to start new game');
+            }
+        }
+
+        // Submit guess
+        async function submitGuess() {
+            if (!currentGameId) {
+                showError('No active game. Please start a new game first.');
+                return;
+            }
+            
+            const guess = parseInt(guessInput.value);
+            
+            if (isNaN(guess) || guess < 1 || guess > 100) {
+                showError('Please enter a valid number between 1 and 100');
+                guessInput.classList.add('shake');
+                setTimeout(() => guessInput.classList.remove('shake'), 500);
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/submit-guess', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        game_id: currentGameId,
+                        player: currentPhase,
+                        guess: guess
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    showError(data.error);
+                    return;
+                }
+                
+                // Update current player stats
+                if (currentPhase === 1) {
+                    player1Guess.textContent = guess;
+                    player1Attempts.textContent = data.attempts;
+                } else {
+                    player2Guess.textContent = guess;
+                    player2Attempts.textContent = data.attempts;
+                }
+                
+                if (data.correct) {
+                    if (currentPhase === 1) {
+                        // Player 1 found it, switch to Player 2
+                        currentPhase = 2;
+                        gameStatusEl.textContent = data.message;
+                        player1Card.classList.remove('active', 'pulse');
+                        player1Card.classList.add('completed');
+                        player2Card.classList.add('active', 'pulse');
+                        player1Badge.textContent = 'Completed';
+                        player2Badge.style.display = 'inline-block';
+                        player2Badge.textContent = 'Your turn';
+                    } else {
+                        // Game over
+                        gameStatusEl.textContent = data.message;
+                        gameStatusEl.classList.add('winner');
+                        
+                        if (data.winner === 1) {
+                            player1Card.classList.add('winner');
+                            player1Badge.textContent = 'Winner!';
+                        } else if (data.winner === 2) {
+                            player2Card.classList.add('winner');
+                            player2Badge.textContent = 'Winner!';
+                        } else {
+                            // Draw
+                            player1Card.classList.add('winner');
+                            player2Card.classList.add('winner');
+                            player1Badge.textContent = 'Draw!';
+                            player2Badge.textContent = 'Draw!';
+                        }
+                        
+                        submitGuessBtn.disabled = true;
+                    }
+                } else {
+                    gameStatusEl.textContent = data.message;
+                }
+                
+                guessInput.value = '';
+                guessInput.focus();
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Failed to submit guess');
+            }
+        }
+
+        // Reveal number
+        async function revealNumber() {
+            if (!currentGameId) {
+                showError('No active game. Please start a new game first.');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/reveal-number', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        game_id: currentGameId
+                    })
+                });
+                
+                const data = await response.json();
+                gameStatusEl.textContent = `The secret number was ${data.target}`;
+                gameStatusEl.classList.add('fade-in');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Failed to reveal number');
+            }
+        }
+
+        // Show error message
+        function showError(message) {
+            gameStatusEl.textContent = message;
+            gameStatusEl.classList.add('fade-in');
+        }
+    </script>
+</body>
+</html>
